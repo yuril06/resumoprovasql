@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Modelagem de Banco de Dados</title>
+<meta name="description" content="Estudos de modelagem de banco de dados e SQL: modelo relacional, DER, DDL/DML, consultas, JOIN e normalização, com quiz, simulado e flashcards.">
+<meta name="theme-color" content="#05060a">
+<meta name="robots" content="index,follow">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pt_BR">
+<meta property="og:title" content="Modelagem de Banco de Dados">
+<meta property="og:description" content="Estude modelagem e SQL com exemplos, quiz, simulado e flashcards.">
+<meta name="twitter:card" content="summary">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%97%84%EF%B8%8F%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05060a; --panel:#0b0e17; --panel2:#111626; --line:#1f2740;
+  --text:#eaf0ff; --muted:#8e99bd; --gold:#00f0ff; --gold2:#ff3df2; --lime:#b6ff3c;
+  --ok:#39ff88; --bad:#ff4d6d;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-height:100%}
+code,.mono{font-family:'JetBrains Mono',monospace}
+h1,h2,h3,.disp{font-family:'Space Grotesk',sans-serif}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 18px 60px}
+header{display:flex;align-items:center;gap:14px;padding:18px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--bg);z-index:5;padding-top:calc(18px + env(safe-area-inset-top,0px))}
+header .badge{width:38px;height:38px;border-radius:8px;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;font-weight:700;color:#05060a;font-family:'Space Grotesk',sans-serif}
+header h1{font-size:1.1rem;margin:0}
+header p{margin:0;color:var(--muted);font-size:.8rem}
+nav{display:flex;gap:6px;flex-wrap:wrap;margin:18px 0 22px}
+nav button{background:var(--panel);border:1px solid var(--line);color:var(--muted);padding:9px 14px;border-radius:8px;font-size:.85rem;cursor:pointer;font-family:'Inter',sans-serif;font-weight:600}
+nav button.active{background:var(--gold);color:#05060a;border-color:var(--gold)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.mcard{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;cursor:pointer}
+.mcard:hover{border-color:var(--gold)}
+.mcard h3{margin:0 0 6px;font-size:1rem}
+.mcard span{color:var(--muted);font-size:.78rem}
+.pill{display:inline-block;background:var(--panel2);color:var(--gold2);font-size:.72rem;padding:3px 9px;border-radius:99px;margin-bottom:8px}
+.topic{border-bottom:1px solid var(--line);padding:16px 0}
+.topic:last-child{border-bottom:none}
+.topic h3{margin:0 0 6px;font-size:1rem;color:var(--gold2)}
+.topic p{margin:0;color:var(--text);line-height:1.55;font-size:.92rem}
+pre{background:#08152c;border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;font-size:.8rem;color:#9fd8ff;margin:8px 0 0}
+.opt{display:block;width:100%;text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--text);padding:12px 14px;border-radius:8px;margin-bottom:8px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.92rem}
+.opt:hover{border-color:var(--gold)}
+.opt.correct{border-color:var(--ok);background:#0f3a2c}
+.opt.wrong{border-color:var(--bad);background:#3a1414}
+.opt[disabled]{cursor:default}
+.btn{background:var(--gold);color:#05060a;border:none;padding:11px 20px;border-radius:8px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+.progbar{height:6px;background:var(--panel2);border-radius:99px;overflow:hidden;margin:14px 0}
+.progbar div{height:100%;background:var(--gold)}
+.explain{margin-top:12px;padding:12px;background:var(--panel2);border-radius:8px;font-size:.87rem;color:var(--muted);border-left:3px solid var(--gold)}
+.flash{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:40px 24px;text-align:center;min-height:180px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:1.15rem}
+.flash small{display:block;color:var(--gold2);font-size:.75rem;margin-top:10px;letter-spacing:.3px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:14px}
+textarea{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--text);border-radius:8px;padding:12px;font-family:'Inter',sans-serif;min-height:90px;font-size:.9rem}
+.stat{background:var(--panel2);border-radius:8px;padding:14px;text-align:center}
+.stat b{display:block;font-size:1.6rem;color:var(--gold2);font-family:'Space Grotesk',sans-serif}
+.stat span{color:var(--muted);font-size:.78rem}
+::-webkit-scrollbar{height:6px;width:6px}::-webkit-scrollbar-thumb{background:var(--line);border-radius:99px}
+
+body{background:radial-gradient(900px 500px at 88% -10%,rgba(255,61,242,.13),transparent 60%),radial-gradient(800px 500px at -8% 8%,rgba(0,240,255,.11),transparent 60%),#05060a;background-attachment:fixed}
+header{background:rgba(5,6,10,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--gold);box-shadow:0 1px 20px -6px var(--gold)}
+header h1{color:#fff;font-size:1.2rem;text-shadow:0 0 12px rgba(0,240,255,.75)}
+header .badge{box-shadow:0 0 16px -2px var(--gold2)}
+nav button:hover{color:#fff;border-color:var(--gold);box-shadow:0 0 12px -3px var(--gold)}
+nav button.active{box-shadow:0 0 18px -2px var(--gold)}
+.card{box-shadow:0 0 34px -20px var(--gold)}
+.mcard{border-color:var(--line);transition:box-shadow .2s,border-color .2s}
+.mcard:hover{border-color:var(--c,var(--gold));box-shadow:0 0 22px -5px var(--c,var(--gold))}
+.mcard .ico{font-size:1.5rem;display:block;margin-bottom:8px}
+.pill{border:1px solid rgba(255,61,242,.45);background:rgba(255,61,242,.08)}
+.topic h3{text-shadow:0 0 10px rgba(255,61,242,.45)}
+.btn{box-shadow:0 0 16px -4px var(--gold)}.btn:hover{filter:brightness(1.15)}
+.progbar div{background:linear-gradient(90deg,var(--gold),var(--gold2));box-shadow:0 0 10px var(--gold)}
+.opt:hover{box-shadow:0 0 12px -4px var(--gold)}
+.opt.correct{border-color:var(--ok);background:rgba(57,255,136,.1);box-shadow:0 0 14px -4px var(--ok)}
+.opt.wrong{border-color:var(--bad);background:rgba(255,77,109,.1);box-shadow:0 0 14px -4px var(--bad)}
+.stat b{text-shadow:0 0 12px var(--gold2)}
+.flash{border-color:var(--gold2);box-shadow:0 0 28px -10px var(--gold2)}
+pre{background:#060810;color:#cfe4ff;border-color:#243055}
+pre.sql{border-left:3px solid var(--gold);position:relative;padding-top:26px;margin-top:12px}
+pre.sql::before{content:"SQL";position:absolute;top:6px;left:12px;font-size:.66rem;color:var(--gold);letter-spacing:.08em;font-family:'JetBrains Mono',monospace}
+.k{color:#ff3df2}.s{color:#b6ff3c}.c{color:#5f6d99;font-style:italic}.t{color:#00f0ff}.f{color:#ffd23f}.n{color:#ff9f43}
+.ill{display:flex;justify-content:center;margin:4px 0 14px}.ill svg{max-width:100%;height:auto}
+.hero{text-align:center;margin-bottom:20px}.hero p{color:var(--muted);font-size:.88rem;margin:8px 0 0}
+.flow{stroke-dasharray:6 6;animation:flow 1.2s linear infinite}
+@keyframes flow{to{stroke-dashoffset:-24}}
+@media (prefers-reduced-motion:reduce){.flow{animation:none}}
+footer{text-align:center;padding:26px 18px calc(30px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
+footer a{color:#fff;text-decoration:none;font-weight:600;display:inline-flex;gap:7px;align-items:center;text-shadow:0 0 12px var(--gold2)}
+footer a:hover{color:var(--gold2)}
+footer a:focus-visible,nav button:focus-visible,.btn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+</style>
+</head>
+<body>
+<header>
+  <div class="badge">DB</div>
+  <div><h1>Modelagem de Banco de Dados</h1><p>Modelagem Relacional &amp; SQL Fundamentos · Prof. Dr. Emerson Abraham</p></div>
+</header>
+<div class="wrap">
+  <nav id="nav"></nav>
+  <div id="view"></div>
+</div>
+<footer>Gostou? Me segue no Instagram<br><a href="https://www.instagram.com/eu_edduu" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>@eu_edduu</a></footer>
+<script>
+const MODULES = [
+{id:"m1",title:"Modelo Relacional",src:"Aula 1",topics:[
+["O modelo relacional","Proposto por Edgar F. Codd em 1970 (IBM), publicado em 'A Relational Model of Data for Large Shared Data Banks'. Organiza dados em relações (tabelas) com linhas e colunas, com base na álgebra relacional e teoria de conjuntos."],
+["Componentes de uma tabela","Linhas (registros/tuplas) representam uma entidade única. Colunas (campos/atributos) descrevem uma característica. Cada coluna tem um tipo de dado (INT, VARCHAR, DECIMAL, DATE, BOOLEAN etc.)."],
+["Entidade, atributo, registro","Entidade = objeto do mundo real (Cliente, Produto) → vira tabela. Atributo = propriedade da entidade (nome, e-mail) → vira coluna. Registro = instância concreta (um cliente específico) → vira linha."],
+["Cardinalidade","1:1 (uma pessoa, um CPF), 1:N (um cliente, vários pedidos), N:N (alunos cursam várias disciplinas e vice-versa) — relação N:N exige tabela associativa."],
+["Chaves PK e FK","PK (chave primária) identifica unicamente cada registro, não aceita nulo nem repetição. FK (chave estrangeira) referencia a PK de outra tabela, implementando o relacionamento e garantindo integridade referencial."]
+]},
+{id:"m2",title:"Modelagem Aplicada (DER)",src:"Aula 3",topics:[
+["Do cenário ao DER","A modelagem parte das regras de negócio: atributos únicos (CPF, e-mail, SKU), status com domínio fechado (Agendada/Realizada/Cancelada) e cardinalidades entre entidades."],
+["Relacionamento N:N → associativa","Quando duas entidades se relacionam em N:N (ex.: Pedido–Produto), é preciso uma tabela associativa (ItemPedido) que carregue os atributos próprios da relação, como quantidade e preço no momento da compra."],
+["Duas associativas encadeadas","Em cenários mais ricos (Universidade), pode haver associativa sobre associativa: Matrícula (Aluno–Turma) e depois Nota (Matrícula–Avaliação), já que a nota depende dos dois."],
+["Preço no momento da compra","Não se deve depender do preço atual do produto: o valor deve ser copiado para o item do pedido no instante da venda, preservando o histórico mesmo se o preço do produto mudar depois."],
+["Restrições de negócio no modelo","Regras como 'não pode haver duas consultas no mesmo horário para o mesmo dentista' viram restrições/índices únicos compostos (ex.: UNIQUE em dentista_id + data_hora)."]
+]},
+{id:"m3",title:"DDL, DML e CRUD",src:"Aula 4",topics:[
+["Três famílias de comandos","DDL (CREATE, ALTER, DROP) cria e altera a estrutura. DML (INSERT, UPDATE, DELETE) mexe nos dados. DQL (SELECT) faz perguntas aos dados. Frase-chave: 'DDL cria a casa, DML mexe nos móveis, DQL faz perguntas'."],
+["Criando tabelas com constraints","CREATE TABLE define colunas e tipos, além de PRIMARY KEY, FOREIGN KEY, UNIQUE e CHECK (ex.: CHECK (salario >= 0), CHECK (status IN ('Ativo','Inativo')))."],
+["CRUD básico","INSERT INTO insere linhas; SELECT consulta; UPDATE altera valores existentes com WHERE; DELETE remove linhas. Em RH real, prefere-se inativar (UPDATE status='Inativo') a deletar o registro do colaborador."],
+["Evoluindo a estrutura (ALTER TABLE)","ALTER TABLE ... ADD coluna adiciona colunas novas; ALTER COLUMN muda tipo/tamanho; ADD CONSTRAINT cria UNIQUE ou DEFAULT depois da tabela já existir."],
+["Modelo Mini RH","4 tabelas: Departamento e Cargo (catálogos), Colaborador (tabela principal, com FKs para os catálogos) e Falta (histórico 1:N ligado ao colaborador)."]
+]},
+{id:"m4",title:"Consultas e Agregações",src:"Aula 5",topics:[
+["Consultas básicas","WHERE filtra linhas; ORDER BY ordena (ASC padrão, DESC decrescente); TOP n limita o resultado; DISTINCT remove duplicados."],
+["Filtros essenciais","LIKE busca por padrão de texto ('%@empresa.com%'); IN testa uma lista de valores; BETWEEN define uma faixa; IS NULL testa ausência de valor."],
+["Funções de agregação","COUNT conta linhas, SUM soma, AVG calcula média, MIN e MAX retornam extremos. Costumam vir combinadas com GROUP BY para relatórios por categoria."],
+["GROUP BY e HAVING","GROUP BY agrupa linhas por uma coluna (ex.: id_departamento); HAVING filtra os grupos já agregados — é o 'WHERE das agregações' (WHERE não pode usar funções de agregação diretamente)."],
+["Índices","Aceleram filtros e ordenações, mas têm custo em escrita (INSERT/UPDATE/DELETE). Índices compostos ajudam filtros com mais de uma coluna, como (status, id_departamento)."]
+]},
+{id:"m5",title:"JOIN, Subquery, CASE e Normalização",src:"Aula 6",topics:[
+["JOIN","Conecta tabelas relacionadas via FK para relatórios completos, como Colaborador + Departamento + Cargo. Funciona bem quando o modelo já está normalizado em catálogos."],
+["Subquery simples","Uma subconsulta no WHERE compara cada linha a um valor calculado, como a média geral de salários: WHERE salario > (SELECT AVG(salario) FROM ...)."],
+["Subquery correlacionada","Referencia a tabela externa dentro da subquery (c2.id_departamento = c.id_departamento), recalculando o valor de comparação para cada linha — útil para 'acima da média do próprio departamento'."],
+["CASE","Cria categorias diretamente no SELECT, traduzindo valores numéricos ou status em classificações de negócio (ex.: faixa salarial, nível de risco)."],
+["Normalização (1FN, 2FN, 3FN)","1FN: valores atômicos, sem listas dentro de um campo (usar tabela associativa Colaborador_Habilidade). 2FN: em chave composta, todo atributo deve depender da chave toda. 3FN: evitar dependência transitiva — não duplicar nome_departamento em Colaborador, usar FK + JOIN."]
+]}];
+
+const QUESTIONS = [
+{m:"m1",q:"Quem propôs o modelo relacional de bancos de dados, em 1970?",o:["Bill Gates","Edgar F. Codd","Larry Ellison","Donald Knuth"],c:1,e:"Edgar F. Codd publicou o artigo seminal sobre o modelo relacional enquanto trabalhava na IBM."},
+{m:"m1",q:"Em uma tabela relacional, o que representa cada linha?",o:["Um atributo","Um tipo de dado","Um registro/entidade única","O nome da tabela"],c:2,e:"Cada linha (registro/tupla) representa uma instância única da entidade."},
+{m:"m1",q:"Qual cardinalidade descreve 'um cliente faz vários pedidos'?",o:["1:1","1:N","N:N","0:0"],c:1,e:"Um cliente pode ter muitos pedidos, mas cada pedido pertence a um único cliente: 1:N."},
+{m:"m1",q:"O que caracteriza uma chave primária (PK)?",o:["Pode repetir valores","Pode ser nula","Identifica unicamente cada registro","Sempre referencia outra tabela"],c:2,e:"A PK garante unicidade absoluta e não aceita valores nulos."},
+{m:"m1",q:"Uma chave estrangeira (FK) serve para:",o:["Ordenar os registros","Referenciar a PK de outra tabela, criando o vínculo","Definir o tipo de dado da coluna","Substituir a PK"],c:1,e:"A FK implementa o relacionamento entre tabelas, garantindo integridade referencial."},
+{m:"m2",q:"Quando duas entidades se relacionam em N:N, como Pedido e Produto, o que é necessário?",o:["Nada, basta uma FK simples","Uma tabela associativa (ex.: ItemPedido)","Duplicar os dados nas duas tabelas","Usar apenas uma chave primária composta sem tabela extra"],c:1,e:"Relações N:N exigem uma tabela associativa que carregue os atributos próprios da relação."},
+{m:"m2",q:"Por que o 'preço no momento da compra' deve ficar salvo no item do pedido, e não ser buscado do produto?",o:["Para economizar espaço","Porque o preço do produto pode mudar depois e alteraria o histórico da venda","Porque o SQL exige isso","Não há motivo real"],c:1,e:"Salvar o preço no item preserva o valor histórico da venda, independente de alterações futuras no produto."},
+{m:"m2",q:"No cenário da clínica odontológica, qual restrição evita duplicidade de horário para o mesmo dentista?",o:["PRIMARY KEY simples em id_consulta","Um índice/constraint único em (dentista_id, data_hora)","FOREIGN KEY em paciente_id","Nenhuma é necessária"],c:1,e:"Uma restrição única composta impede duas consultas no mesmo horário para o mesmo dentista."},
+{m:"m2",q:"No cenário da universidade, qual par de entidades associativas aparece encadeado?",o:["Aluno–Professor e Turma–Disciplina","Matrícula (Aluno–Turma) e Nota (Matrícula–Avaliação)","Disciplina–Professor apenas","Aluno–Avaliação direto"],c:1,e:"Nota depende tanto da Matrícula quanto da Avaliação, formando uma associativa sobre outra associativa."},
+{m:"m2",q:"Guardar 'nome_departamento' dentro da tabela Colaborador, duplicando o que já existe em Departamento, viola qual forma normal?",o:["1FN","2FN","3FN","Nenhuma"],c:2,e:"É uma dependência transitiva: o correto é manter id_departamento (FK) e buscar o nome via JOIN, respeitando a 3FN."},
+{m:"m3",q:"Qual família de comandos SQL é usada para criar e alterar a estrutura das tabelas?",o:["DML","DQL","DDL","DCL"],c:2,e:"DDL (CREATE, ALTER, DROP) cria e modifica a estrutura — 'DDL cria a casa'."},
+{m:"m3",q:"Qual comando pertence à DML?",o:["CREATE TABLE","SELECT","UPDATE","ALTER TABLE"],c:2,e:"UPDATE é DML (mexe nos dados); CREATE e ALTER são DDL; SELECT é DQL."},
+{m:"m3",q:"A constraint CHECK (salario >= 0) serve para:",o:["Definir a chave primária","Garantir que a coluna nunca receba valor negativo","Criar um índice","Referenciar outra tabela"],c:1,e:"CHECK valida uma regra de domínio sobre os valores aceitos na coluna."},
+{m:"m3",q:"Em um sistema de RH real, ao desligar um colaborador, qual é a prática recomendada?",o:["DELETE do registro imediatamente","UPDATE mudando status para 'Inativo'","Remover a tabela inteira","Criar uma nova tabela"],c:1,e:"Inativar preserva o histórico; DELETE é usado com cautela e evitado para colaboradores."},
+{m:"m3",q:"Para adicionar uma nova coluna 'cpf' a uma tabela já existente, usa-se:",o:["CREATE TABLE ... ADD cpf","ALTER TABLE ... ADD cpf VARCHAR(14) NULL","INSERT INTO ... cpf","UPDATE ... ADD cpf"],c:1,e:"ALTER TABLE ADD é o comando DDL correto para acrescentar colunas a uma tabela existente."},
+{m:"m4",q:"Qual cláusula limita a quantidade de linhas retornadas, por exemplo as 3 primeiras?",o:["LIMIT ROWS","TOP 3","MAX(3)","COUNT(3)"],c:1,e:"No T-SQL, TOP n (combinado a ORDER BY) retorna as n primeiras linhas do resultado ordenado."},
+{m:"m4",q:"Qual operador testa se um valor está dentro de uma faixa, como salário entre 5000 e 9000?",o:["IN","LIKE","BETWEEN","IS NULL"],c:2,e:"BETWEEN 5000 AND 9000 define uma faixa de valores (inclusive)."},
+{m:"m4",q:"Qual das opções é uma função de agregação?",o:["WHERE","ORDER BY","AVG","DISTINCT"],c:2,e:"AVG calcula a média; as demais não são funções de agregação."},
+{m:"m4",q:"Qual cláusula filtra grupos já agregados, como departamentos com salário médio acima de 7000?",o:["WHERE","GROUP BY","HAVING","ORDER BY"],c:2,e:"HAVING filtra os grupos formados pelo GROUP BY — o WHERE não pode usar funções de agregação diretamente."},
+{m:"m4",q:"Qual é o principal custo de se criar muitos índices em uma tabela?",o:["Deixa o SELECT mais lento sempre","Aumenta o custo de escrita (INSERT/UPDATE/DELETE)","Impede o uso de WHERE","Remove a necessidade de PK"],c:1,e:"Índices aceleram leitura, mas cada escrita precisa atualizar também os índices, encarecendo INSERT/UPDATE/DELETE."},
+{m:"m5",q:"Para trazer Colaborador junto com o nome do Departamento e do Cargo, o comando adequado é:",o:["Duas subqueries separadas","JOIN com Departamento e com Cargo","GROUP BY departamento","CASE WHEN departamento"],c:1,e:"JOIN conecta as tabelas relacionadas via FK, trazendo os dados de contexto em uma única consulta."},
+{m:"m5",q:"O que caracteriza uma subquery correlacionada?",o:["Ela nunca referencia a tabela externa","Ela referencia uma coluna da consulta externa, sendo recalculada por linha","Ela sempre retorna várias colunas","Ela substitui o JOIN em todos os casos"],c:1,e:"Na subquery correlacionada (ex.: c2.id_departamento = c.id_departamento), o valor de comparação é recalculado para cada linha da consulta externa."},
+{m:"m5",q:"O comando CASE dentro do SELECT serve para:",o:["Criar uma nova tabela","Classificar/traduzir valores em categorias diretamente no resultado","Deletar registros condicionalmente","Substituir o JOIN"],c:1,e:"CASE permite criar colunas de classificação (ex.: faixa salarial) a partir de regras condicionais sobre os dados."},
+{m:"m5",q:"Guardar habilidades como uma lista de texto em um único campo (ex.: 'Excel;PowerBI;Python') viola qual forma normal?",o:["1FN","2FN","3FN","Nenhuma"],c:0,e:"A 1FN exige valores atômicos; a solução é criar uma tabela Habilidade e uma tabela associativa Colaborador_Habilidade."},
+{m:"m5",q:"Em uma tabela associativa com chave composta (id_colaborador, id_habilidade), colocar nome_colaborador nessa tabela violaria:",o:["1FN","2FN","3FN","Nenhuma forma normal"],c:1,e:"A 2FN exige que todo atributo dependa da chave composta inteira; nome_colaborador depende só de id_colaborador."}
+];
+
+const ESSAYS = [
+{m:"m1",q:"Explique, com um exemplo próprio (fora do Mini RH), a diferença entre entidade, atributo e registro.",g:"Espera-se identificar uma entidade (ex.: Livro), seus atributos (título, ISBN, autor) e um registro concreto (um livro específico com valores preenchidos), relacionando ao conceito de tabela/coluna/linha."},
+{m:"m2",q:"Descreva como você modelaria a relação N:N entre Pedido e Produto, incluindo por que uma tabela associativa é necessária e quais atributos ela carregaria.",g:"Deve mencionar a tabela ItemPedido com FKs para Pedido e Produto, além de quantidade e preço_unitario_momento, justificando que atributos da relação (não da entidade) vivem na associativa."},
+{m:"m3",q:"Compare DDL, DML e DQL com exemplos de comandos de cada família e explique por que a distinção importa na prática.",g:"Deve citar DDL (CREATE/ALTER/DROP - estrutura), DML (INSERT/UPDATE/DELETE - dados) e DQL (SELECT - consulta), e explicar que a distinção orienta quando alterar estrutura x dados x apenas ler."},
+{m:"m4",q:"Explique a diferença entre WHERE e HAVING, com um exemplo de consulta em que apenas o HAVING resolveria o problema.",g:"Deve explicar que WHERE filtra linhas antes do agrupamento e não aceita funções de agregação, enquanto HAVING filtra grupos já agregados (ex.: departamentos com AVG(salario) > 7000)."},
+{m:"m5",q:"Explique a diferença entre uma subquery simples e uma subquery correlacionada, dando um exemplo de uso de cada uma no contexto do Mini RH.",g:"Simples: calcula um valor fixo (ex.: média geral de salários) uma vez. Correlacionada: recalcula o valor por linha, referenciando a tabela externa (ex.: média do próprio departamento do colaborador)."}
+];
+
+const FLASH = [
+["PK — Chave Primária","Identifica unicamente cada registro de uma tabela; não aceita nulos nem repetições."],
+["FK — Chave Estrangeira","Coluna que referencia a PK de outra tabela, criando o relacionamento e garantindo integridade referencial."],
+["DDL","Data Definition Language: CREATE, ALTER, DROP — define a estrutura do banco."],
+["DML","Data Manipulation Language: INSERT, UPDATE, DELETE — manipula os dados."],
+["DQL","Data Query Language: SELECT — consulta os dados."],
+["Cardinalidade 1:N","Uma instância de A se relaciona com várias de B (ex.: um colaborador tem várias faltas)."],
+["Tabela associativa","Tabela criada para resolver um relacionamento N:N, carregando FKs das duas entidades e atributos próprios da relação."],
+["1FN","Todo atributo deve ter valor atômico — nada de listas dentro de um campo."],
+["2FN","Em chave composta, todo atributo não-chave deve depender da chave inteira, não de parte dela."],
+["3FN","Evitar dependência transitiva — não duplicar dados que já existem em outra tabela referenciada por FK."],
+["JOIN","Combina linhas de duas ou mais tabelas relacionadas, geralmente via FK, em uma única consulta."],
+["Subquery correlacionada","Subconsulta que referencia uma coluna da consulta externa, sendo recalculada para cada linha."],
+["CASE","Expressão do SELECT que classifica/traduz valores em categorias de negócio."],
+["GROUP BY","Agrupa linhas que compartilham valores em uma ou mais colunas, para uso com funções de agregação."],
+["HAVING","Filtra grupos já formados pelo GROUP BY — o 'WHERE' das agregações."],
+["Índice","Estrutura que acelera buscas/ordenações, com custo adicional em operações de escrita."],
+["CHECK","Constraint que valida uma regra de domínio sobre os valores aceitos em uma coluna."]
+];
+
+
+const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function hl(s){return esc(s).replace(/(--.*$)|('[^']*')|\b(CREATE|TABLE|PRIMARY|KEY|FOREIGN|REFERENCES|INSERT|INTO|VALUES|SELECT|FROM|WHERE|UPDATE|SET|ALTER|ADD|COLUMN|CONSTRAINT|UNIQUE|CHECK|IN|NOT|NULL|JOIN|ON|AS|GROUP|BY|HAVING|ORDER|DESC|DISTINCT|TOP|LIKE|BETWEEN|AND|IS|CASE|WHEN|THEN|ELSE|END|INDEX|IDENTITY)\b|\b(INT|VARCHAR|DECIMAL|DATE|CHAR|BIT)\b|\b(COUNT|SUM|AVG|MIN|MAX)\b|\b(\d+)\b/gm,(m,c,st,k,t,f,n)=>c?`<span class="c">${c}</span>`:st?`<span class="s">${st}</span>`:k?`<span class="k">${k}</span>`:t?`<span class="t">${t}</span>`:f?`<span class="f">${f}</span>`:`<span class="n">${n}</span>`)}
+
+const SQL = {
+m1:[
+`-- Uma relação (tabela) = linhas x colunas
+CREATE TABLE Colaborador (
+  id_colaborador INT PRIMARY KEY,
+  nome           VARCHAR(80),
+  admissao       DATE
+);`,
+`CREATE TABLE Produto (
+  id_produto INT,            -- coluna (atributo)
+  nome       VARCHAR(60),    -- texto
+  preco      DECIMAL(10,2),  -- decimal
+  ativo      BIT             -- verdadeiro/falso
+);`,
+`-- Entidade -> tabela | Atributo -> coluna | Registro -> linha
+CREATE TABLE Cliente (id INT PRIMARY KEY, nome VARCHAR(80), email VARCHAR(100));
+INSERT INTO Cliente VALUES (1, 'Ana Souza', 'ana@email.com'); -- 1 registro`,
+`-- 1:N -> a FK fica no lado "N"
+CREATE TABLE Pedido (
+  id_pedido  INT PRIMARY KEY,
+  id_cliente INT REFERENCES Cliente(id)
+);
+-- N:N -> tabela associativa
+CREATE TABLE Matricula (
+  id_aluno INT, id_disciplina INT,
+  PRIMARY KEY (id_aluno, id_disciplina)
+);`,
+`CREATE TABLE Falta (
+  id_falta       INT PRIMARY KEY,             -- PK
+  id_colaborador INT NOT NULL,
+  data_falta     DATE,
+  FOREIGN KEY (id_colaborador)
+    REFERENCES Colaborador(id_colaborador)     -- FK
+);`],
+m2:[
+`CREATE TABLE Paciente (
+  id_paciente INT PRIMARY KEY,
+  cpf   CHAR(11)     NOT NULL UNIQUE,   -- atributo único
+  email VARCHAR(100) UNIQUE
+);
+CREATE TABLE Consulta (
+  id_consulta INT PRIMARY KEY,
+  status VARCHAR(10) CHECK (status IN ('Agendada','Realizada','Cancelada'))
+);`,
+`CREATE TABLE ItemPedido (
+  id_pedido      INT REFERENCES Pedido(id_pedido),
+  id_produto     INT REFERENCES Produto(id_produto),
+  quantidade     INT NOT NULL,
+  preco_unitario DECIMAL(10,2) NOT NULL,
+  PRIMARY KEY (id_pedido, id_produto)
+);`,
+`CREATE TABLE Matricula (
+  id_matricula INT PRIMARY KEY,
+  id_aluno INT REFERENCES Aluno(id_aluno),
+  id_turma INT REFERENCES Turma(id_turma)
+);
+CREATE TABLE Nota (
+  id_matricula INT REFERENCES Matricula(id_matricula),
+  id_avaliacao INT REFERENCES Avaliacao(id_avaliacao),
+  valor DECIMAL(4,2),
+  PRIMARY KEY (id_matricula, id_avaliacao)
+);`,
+`INSERT INTO ItemPedido (id_pedido, id_produto, quantidade, preco_unitario)
+SELECT 10, p.id_produto, 2, p.preco   -- copia o preço de hoje
+FROM Produto p WHERE p.id_produto = 5;`,
+`ALTER TABLE Consulta
+ADD CONSTRAINT uq_dentista_horario
+UNIQUE (id_dentista, data_hora);`],
+m3:[
+`CREATE TABLE Setor (id INT PRIMARY KEY);   -- DDL
+INSERT INTO Setor VALUES (1);              -- DML
+SELECT * FROM Setor;                       -- DQL`,
+`CREATE TABLE Colaborador (
+  id_colaborador INT IDENTITY PRIMARY KEY,
+  nome    VARCHAR(80) NOT NULL,
+  email   VARCHAR(100) UNIQUE,
+  salario DECIMAL(10,2) CHECK (salario >= 0),
+  status  VARCHAR(10)   CHECK (status IN ('Ativo','Inativo'))
+);`,
+`INSERT INTO Colaborador (nome, salario, status) VALUES ('Lia', 5200, 'Ativo');
+SELECT nome, salario FROM Colaborador;
+UPDATE Colaborador SET salario = 5600 WHERE id_colaborador = 1;
+-- Desligamento: inativar, não apagar
+UPDATE Colaborador SET status = 'Inativo' WHERE id_colaborador = 1;`,
+`ALTER TABLE Colaborador ADD cpf VARCHAR(14) NULL;
+ALTER TABLE Colaborador ALTER COLUMN nome VARCHAR(120) NOT NULL;
+ALTER TABLE Colaborador ADD CONSTRAINT uq_cpf UNIQUE (cpf);`,
+`CREATE TABLE Departamento (id_departamento INT PRIMARY KEY, nome VARCHAR(60));
+CREATE TABLE Cargo (id_cargo INT PRIMARY KEY, nome VARCHAR(60));
+CREATE TABLE Colaborador (
+  id_colaborador  INT PRIMARY KEY, nome VARCHAR(80),
+  id_departamento INT REFERENCES Departamento(id_departamento),
+  id_cargo        INT REFERENCES Cargo(id_cargo)
+);
+CREATE TABLE Falta (
+  id_falta INT PRIMARY KEY, data_falta DATE,
+  id_colaborador INT REFERENCES Colaborador(id_colaborador)
+);`],
+m4:[
+`SELECT DISTINCT TOP 3 nome, salario
+FROM Colaborador
+WHERE status = 'Ativo'
+ORDER BY salario DESC;`,
+`SELECT * FROM Colaborador
+WHERE email LIKE '%@empresa.com%'
+  AND id_departamento IN (1, 2)
+  AND salario BETWEEN 5000 AND 9000
+  AND data_desligamento IS NULL;`,
+`SELECT COUNT(*) AS total, SUM(salario) AS folha,
+       AVG(salario) AS media, MIN(salario) AS menor, MAX(salario) AS maior
+FROM Colaborador;`,
+`SELECT id_departamento, AVG(salario) AS media
+FROM Colaborador
+GROUP BY id_departamento
+HAVING AVG(salario) > 7000;   -- filtra o grupo, não a linha`,
+`CREATE INDEX ix_colab_status_depto
+ON Colaborador (status, id_departamento);`],
+m5:[
+`SELECT c.nome, d.nome AS departamento, g.nome AS cargo
+FROM Colaborador c
+JOIN Departamento d ON d.id_departamento = c.id_departamento
+JOIN Cargo g        ON g.id_cargo = c.id_cargo;`,
+`SELECT nome, salario FROM Colaborador
+WHERE salario > (SELECT AVG(salario) FROM Colaborador);`,
+`SELECT c.nome, c.salario FROM Colaborador c
+WHERE c.salario > (
+  SELECT AVG(c2.salario) FROM Colaborador c2
+  WHERE c2.id_departamento = c.id_departamento   -- correlação
+);`,
+`SELECT nome, salario,
+  CASE WHEN salario < 4000 THEN 'Júnior'
+       WHEN salario < 8000 THEN 'Pleno'
+       ELSE 'Sênior' END AS faixa
+FROM Colaborador;`,
+`-- 1FN: nada de 'Excel;PowerBI;Python' num campo só
+CREATE TABLE Habilidade (id_habilidade INT PRIMARY KEY, nome VARCHAR(50));
+CREATE TABLE Colaborador_Habilidade (
+  id_colaborador INT REFERENCES Colaborador(id_colaborador),
+  id_habilidade  INT REFERENCES Habilidade(id_habilidade),
+  PRIMARY KEY (id_colaborador, id_habilidade)
+);`]};
+
+const GLOW='<defs><filter id="g" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>';
+const box=(x,y,w,h,c,t,l)=>`<g filter="url(#g)"><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="#0b0e17" stroke="${c}" stroke-width="1.6"/></g><text x="${x+12}" y="${y+22}" fill="${c}" font-family="Space Grotesk,sans-serif" font-weight="700" font-size="14">${t}</text>`+l.map((s,i)=>`<text x="${x+12}" y="${y+42+i*16}" fill="#b8c3e6" font-family="JetBrains Mono,monospace" font-size="10.5">${s}</text>`).join("");
+const ER_SVG=`<svg viewBox="0 0 640 260" width="640" role="img" aria-label="Diagrama do banco de RH: Departamento e Cargo ligados a Colaborador, que se liga a Falta">${GLOW}
+<g fill="none" stroke-width="2" class="flow"><path d="M190 65 L235 115" stroke="#00f0ff"/><path d="M190 195 L235 155" stroke="#b6ff3c"/><path d="M425 135 L470 135" stroke="#ff3df2"/></g>
+<g fill="#eaf0ff" font-family="JetBrains Mono,monospace" font-size="11"><text x="196" y="62">1</text><text x="218" y="130">N</text><text x="196" y="200">1</text><text x="218" y="150">N</text><text x="432" y="128">1</text><text x="452" y="128">N</text></g>
+${box(20,20,170,90,"#00f0ff","Departamento",["PK id_departamento","nome"])}
+${box(20,150,170,90,"#b6ff3c","Cargo",["PK id_cargo","nome"])}
+${box(235,80,190,110,"#ff3df2","Colaborador",["PK id_colaborador","FK id_departamento","FK id_cargo","nome · salario · status"])}
+${box(470,80,150,110,"#ffd23f","Falta",["PK id_falta","FK id_colaborador","data_falta"])}</svg>`;
+const mini=(c,inner)=>`<svg viewBox="0 0 160 80" width="240" fill="none" stroke="${c}" stroke-width="2" style="filter:drop-shadow(0 0 6px ${c})">${inner}</svg>`;
+const ILLUS={
+m1:mini("#00f0ff",'<rect x="20" y="10" width="120" height="60" rx="6"/><path d="M20 28h120M60 10v60M100 10v60"/><text x="26" y="23" fill="#00f0ff" stroke="none" font-size="9" font-family="JetBrains Mono">PK</text>'),
+m2:mini("#ff3df2",'<rect x="6" y="26" width="40" height="28" rx="5"/><rect x="60" y="26" width="40" height="28" rx="5" stroke="#ffd23f"/><rect x="114" y="26" width="40" height="28" rx="5"/><path d="M46 40h14M100 40h14" class="flow"/><text x="66" y="44" fill="#ffd23f" stroke="none" font-size="8" font-family="JetBrains Mono">N:N</text>'),
+m3:ER_SVG,
+m4:mini("#b6ff3c",'<rect x="20" y="40" width="20" height="30"/><rect x="50" y="22" width="20" height="48" stroke="#00f0ff"/><rect x="80" y="30" width="20" height="40" stroke="#ff3df2"/><rect x="110" y="8" width="20" height="62" stroke="#ffd23f"/>'),
+m5:mini("#00f0ff",'<circle cx="62" cy="40" r="28" fill="rgba(0,240,255,.12)"/><circle cx="98" cy="40" r="28" stroke="#ff3df2" fill="rgba(255,61,242,.12)"/><text x="68" y="44" fill="#fff" stroke="none" font-size="9" font-family="JetBrains Mono">JOIN</text>')};
+const ICONS=["🗂️","🔗","🏗️","📊","🧩"],NEON=["#00f0ff","#ff3df2","#b6ff3c","#ffd23f","#a78bfa"];
+
+let state = {view:"mapa", quiz:null, sim:null, flashIdx:0, flashFlip:false};
+function ls_get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
+function ls_set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+
+const TABS = [["mapa","Mapa"],["estudar","Estudar"],["quiz","Quiz"],["simulado","Simulado"],["flashcards","Flashcards"],["progresso","Progresso"]];
+function renderNav(){
+  document.getElementById("nav").innerHTML = TABS.map(([id,l])=>
+    `<button class="${state.view===id?'active':''}" onclick="setView('${id}')">${l}</button>`).join("");
+}
+function setView(v){state.view=v; if(v!=="quiz")state.quiz=null; if(v!=="simulado")state.sim=null; renderNav(); render();}
+
+function render(){
+  const el = document.getElementById("view");
+  if(state.view==="mapa") el.innerHTML = mapaHTML();
+  else if(state.view==="estudar") el.innerHTML = estudarHTML(state.estudoMod);
+  else if(state.view==="quiz") el.innerHTML = quizHTML();
+  else if(state.view==="simulado") el.innerHTML = simHTML();
+  else if(state.view==="flashcards") el.innerHTML = flashHTML();
+  else if(state.view==="progresso") el.innerHTML = progHTML();
+}
+
+function mapaHTML(){
+  return `<div class="hero"><div class="ill">${ER_SVG}</div><p>Exemplo do curso: um banco de RH com 4 tabelas e 3 relacionamentos 1:N. Escolha um módulo para estudar.</p></div><div class="grid">` + MODULES.map((m,i)=>
+    `<div class="mcard" style="--c:${NEON[i]}" onclick="openModulo('${m.id}')"><span class="ico">${ICONS[i]}</span><span class="pill">${m.src}</span><h3>${m.title}</h3><span>${m.topics.length} tópicos com SQL</span></div>`
+  ).join("") + `</div>`;
+}
+function openModulo(id){state.view="estudar";state.estudoMod=id;renderNav();render();window.scrollTo(0,0)}
+
+function estudarHTML(modId){
+  const mods = modId ? MODULES.filter(m=>m.id===modId) : MODULES;
+  return mods.map(m=>`<div class="card" style="margin-bottom:16px"><span class="pill">${m.src}</span><h2 style="margin:4px 0 12px">${m.title}</h2><div class="ill">${ILLUS[m.id]}</div>` +
+    m.topics.map((t,i)=>`<div class="topic"><h3>${t[0]}</h3><p>${t[1]}</p><pre class="sql"><code>${hl(SQL[m.id][i])}</code></pre></div>`).join("") + `</div>`).join("") +
+    (modId? `<button class="btn ghost" onclick="state.estudoMod=null;render()">Ver todos os módulos</button>`:"");
+}
+
+function newAttempt(qs){return {qs, idx:0, answers:Array(qs.length).fill(null), started:Date.now()}}
+
+function quizHTML(){
+  if(!state.quiz) state.quiz = newAttempt(shuffle([...QUESTIONS.keys()]));
+  return attemptHTML(state.quiz, "quiz", false);
+}
+function simHTML(){
+  if(!state.sim){
+    const mc = shuffle([...QUESTIONS.keys()]);
+    state.sim = newAttempt(mc);
+    state.sim.essayAns = Array(ESSAYS.length).fill("");
+  }
+  return attemptHTML(state.sim, "sim", true);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+
+function attemptHTML(st, key, withEssay){
+  if(st.done) return resultHTML(st, key, withEssay);
+  const qi = st.qs[st.idx];
+  const q = QUESTIONS[qi];
+  const mod = MODULES.find(m=>m.id===q.m);
+  const answered = st.answers[st.idx]!==null;
+  const pct = Math.round((st.idx/st.qs.length)*100);
+  return `<div class="card">
+    <span class="pill">${mod.title}</span>
+    <div class="progbar"><div style="width:${pct}%"></div></div>
+    <p style="color:var(--muted);font-size:.8rem;margin:0 0 4px">Questão ${st.idx+1} de ${st.qs.length}</p>
+    <h3 style="margin:0 0 16px">${q.q}</h3>
+    ${q.o.map((op,i)=>`<button class="opt ${answered?(i===q.c?'correct':(i===st.answers[st.idx]?'wrong':'')):''}" ${answered?'disabled':''} onclick="answer('${key}',${i})">${op}</button>`).join("")}
+    ${answered?`<div class="explain">${q.e}</div>`:""}
+    <div class="row">
+      ${answered?`<button class="btn" onclick="nextQ('${key}',${withEssay})">${st.idx+1<st.qs.length?'Próxima':(withEssay?'Ir para as dissertativas':'Ver resultado')}</button>`:""}
+    </div>
+  </div>`;
+}
+function answer(key,i){
+  const st = key==="quiz"?state.quiz:state.sim;
+  if(st.answers[st.idx]!==null) return;
+  st.answers[st.idx]=i; render();
+}
+function nextQ(key,withEssay){
+  const st = key==="quiz"?state.quiz:state.sim;
+  if(st.idx+1<st.qs.length){st.idx++; render(); window.scrollTo(0,0); return}
+  if(withEssay && !st.essayPhase){st.essayPhase=true; render(); window.scrollTo(0,0); return}
+  st.done=true;
+  const score = st.qs.reduce((s,qi,i)=> s + (st.answers[i]===QUESTIONS[qi].c?1:0), 0);
+  const hist = ls_get("history",[]);
+  hist.push({key, score, total: st.qs.length, date: new Date().toISOString()});
+  ls_set("history", hist);
+  render(); window.scrollTo(0,0);
+}
+
+function resultHTML(st, key, withEssay){
+  if(withEssay && st.essayPhase && !st.essayShown){
+    return `<div class="card"><h2 style="margin-top:0">Questões dissertativas</h2><p style="color:var(--muted)">Responda livremente e depois compare com o roteiro de correção.</p>` +
+      ESSAYS.map((e,i)=>`<div class="topic"><h3>${MODULES.find(m=>m.id===e.m).title}</h3><p>${e.q}</p>
+        <textarea placeholder="Sua resposta..." onchange="st_essay(${i},this.value)">${st.essayAns[i]}</textarea></div>`).join("") +
+      `<div class="row"><button class="btn" onclick="finishEssay('${key}')">Finalizar simulado</button></div></div>`;
+  }
+  const score = st.qs.reduce((s,qi,i)=> s + (st.answers[i]===QUESTIONS[qi].c?1:0), 0);
+  const pct = Math.round(score/st.qs.length*100);
+  let html = `<div class="card"><h2 style="margin-top:0">Resultado</h2>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+      <div class="stat"><b>${score}/${st.qs.length}</b><span>Acertos</span></div>
+      <div class="stat"><b>${pct}%</b><span>Aproveitamento</span></div>
+      <div class="stat"><b>${pct>=70?'Bom':'Revisar'}</b><span>Sugestão</span></div>
+    </div>
+    <h3>Correção item a item</h3>` +
+    st.qs.map((qi,i)=>{
+      const q = QUESTIONS[qi]; const ok = st.answers[i]===q.c;
+      return `<div class="topic"><h3 style="color:${ok?'var(--ok)':'var(--bad)'}">${ok?'Correto':'Incorreto'} — ${q.q}</h3>
+        <p>Sua resposta: ${q.o[st.answers[i]]??'—'}${ok?'':' · Correta: '+q.o[q.c]}</p>
+        <div class="explain">${q.e}</div></div>`;
+    }).join("");
+  if(withEssay){
+    html += `<h3>Roteiro das dissertativas</h3>` + ESSAYS.map((e,i)=>
+      `<div class="topic"><h3>${e.q}</h3><p><b>Sua resposta:</b> ${st.essayAns[i]||'(em branco)'}</p><div class="explain"><b>Sugestão de correção:</b> ${e.g}</div></div>`).join("");
+  }
+  const weak = [...new Set(st.qs.filter((qi,i)=>st.answers[i]!==QUESTIONS[qi].c).map(qi=>MODULES.find(m=>m.id===QUESTIONS[qi].m).title))];
+  html += `<div class="explain" style="margin-top:16px"><b>Revisar:</b> ${weak.length? weak.join(", ") : "Nenhum ponto fraco — mandou bem!"}</div>
+    <div class="row"><button class="btn" onclick="restart('${key}',${withEssay})">Tentar novamente</button></div></div>`;
+  return html;
+}
+function st_essay(i,v){state.sim.essayAns[i]=v}
+function finishEssay(key){state.sim.essayShown=true; nextQ(key,true)}
+function restart(key,withEssay){ if(key==="quiz")state.quiz=null; else state.sim=null; render(); window.scrollTo(0,0)}
+
+function flashHTML(){
+  const f = FLASH[state.flashIdx];
+  return `<div class="card">
+    <p style="color:var(--muted);font-size:.85rem;margin:0 0 14px">Card ${state.flashIdx+1} de ${FLASH.length}</p>
+    <div class="flash" onclick="flipCard()">${state.flashFlip? f[1] : f[0]}<small>${state.flashFlip? 'clique para ver o termo':'clique para ver a definição'}</small></div>
+    <div class="row"><button class="btn ghost" onclick="stepCard(-1)">Anterior</button><button class="btn" onclick="stepCard(1)">Próximo</button></div>
+  </div>`;
+}
+function flipCard(){state.flashFlip=!state.flashFlip; render()}
+function stepCard(d){state.flashIdx=(state.flashIdx+d+FLASH.length)%FLASH.length; state.flashFlip=false; render()}
+
+function progHTML(){
+  const hist = ls_get("history",[]);
+  if(!hist.length) return `<div class="card"><h2 style="margin-top:0">Progresso</h2><p style="color:var(--muted)">Ainda sem tentativas registradas. Faça um Quiz ou Simulado para começar a acompanhar sua evolução.</p></div>`;
+  const avg = Math.round(hist.reduce((s,h)=>s+h.score/h.total,0)/hist.length*100);
+  const best = Math.round(Math.max(...hist.map(h=>h.score/h.total))*100);
+  return `<div class="card"><h2 style="margin-top:0">Progresso</h2>
+    <div class="grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px">
+      <div class="stat"><b>${hist.length}</b><span>Tentativas</span></div>
+      <div class="stat"><b>${avg}%</b><span>Média geral</span></div>
+      <div class="stat"><b>${best}%</b><span>Melhor resultado</span></div>
+    </div>
+    <h3>Histórico</h3>` +
+    hist.slice().reverse().map(h=>`<div class="topic"><h3>${h.key==='sim'?'Simulado':'Quiz'} — ${Math.round(h.score/h.total*100)}%</h3><p>${h.score}/${h.total} acertos · ${new Date(h.date).toLocaleString('pt-BR')}</p></div>`).join("") +
+    `</div>`;
+}
+
+renderNav(); render();
+</script>
+</body>
+</html>
